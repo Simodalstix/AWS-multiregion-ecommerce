@@ -1,28 +1,88 @@
 #!/usr/bin/env python3
 import os
-
 import aws_cdk as cdk
-
-from aws_codepipeline_eventbridge.aws_codepipeline_eventbridge_stack import AwsCodepipelineEventbridgeStack
-
+from infrastructure.lib.network_stack import NetworkStack
+from infrastructure.lib.core_services_stack import CoreServicesStack
+from infrastructure.lib.api_compute_stack import ApiComputeStack
+from infrastructure.lib.pipeline_stack import PipelineStack
 
 app = cdk.App()
-AwsCodepipelineEventbridgeStack(app, "AwsCodepipelineEventbridgeStack",
-    # If you don't specify 'env', this stack will be environment-agnostic.
-    # Account/Region-dependent features and context lookups will not work,
-    # but a single synthesized template can be deployed anywhere.
 
-    # Uncomment the next line to specialize this stack for the AWS Account
-    # and Region that are implied by the current CLI configuration.
+# Environment configurations
+primary_env = cdk.Environment(
+    account=os.getenv('CDK_DEFAULT_ACCOUNT'),
+    region=os.getenv('CDK_DEFAULT_REGION', 'ap-southeast-2')  # Primary region
+)
 
-    #env=cdk.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.getenv('CDK_DEFAULT_REGION')),
+secondary_env = cdk.Environment(
+    account=os.getenv('CDK_DEFAULT_ACCOUNT'),
+    region='us-west-2'  # Secondary region (US West)
+)
 
-    # Uncomment the next line if you know exactly what Account and Region you
-    # want to deploy the stack to. */
+# Primary region stacks
+primary_network = NetworkStack(
+    app, "PrimaryNetworkStack",
+    env=primary_env,
+    description="Network infrastructure for primary region"
+)
 
-    #env=cdk.Environment(account='123456789012', region='us-east-1'),
+primary_core = CoreServicesStack(
+    app, "PrimaryCoreStack",
+    env=primary_env,
+    description="Core services for primary region"
+)
 
-    # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
-    )
+primary_api = ApiComputeStack(
+    app, "PrimaryApiStack",
+    event_bus_arn=primary_core.event_bus.event_bus_arn,
+    orders_table_name=primary_core.orders_table.table_name,
+    vpc=primary_network.vpc,
+    env=primary_env,
+    description="API and compute resources for primary region"
+)
+
+# Secondary region stacks
+secondary_network = NetworkStack(
+    app, "SecondaryNetworkStack",
+    env=secondary_env,
+    description="Network infrastructure for secondary region"
+)
+
+secondary_core = CoreServicesStack(
+    app, "SecondaryCoreStack",
+    env=secondary_env,
+    description="Core services for secondary region"
+)
+
+secondary_api = ApiComputeStack(
+    app, "SecondaryApiStack",
+    event_bus_arn=secondary_core.event_bus.event_bus_arn,
+    orders_table_name=secondary_core.orders_table.table_name,
+    vpc=secondary_network.vpc,
+    env=secondary_env,
+    description="API and compute resources for secondary region"
+)
+
+# CI/CD Pipeline stack (deployed in primary region)
+pipeline = PipelineStack(
+    app, "PipelineStack",
+    env=primary_env,
+    description="CI/CD pipeline for multi-region deployment"
+)
+
+# Add dependencies
+primary_core.add_dependency(primary_network)
+primary_api.add_dependency(primary_core)
+secondary_core.add_dependency(secondary_network)
+secondary_api.add_dependency(secondary_core)
+
+# Tags for all stacks
+for stack in [
+    primary_network, primary_core, primary_api,
+    secondary_network, secondary_core, secondary_api,
+    pipeline
+]:
+    cdk.Tags.of(stack).add("Project", "Ecommerce")
+    cdk.Tags.of(stack).add("Environment", "Production")
 
 app.synth()
