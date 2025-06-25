@@ -1,58 +1,68 @@
+# AWS Multi-Region Event-Driven E-commerce Platform
 
-# Welcome to your CDK Python project!
+This project demonstrates an advanced, production-ready e-commerce order processing system built with AWS CDK. It showcases event-driven architecture, multi-region disaster recovery, and automated CI/CD pipelines.
 
-This is a blank project for CDK development with Python.
+## Architecture Overview
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+### Core Components
 
-This project is set up like a standard Python project.  The initialization
-process also creates a virtualenv within this project, stored under the `.venv`
-directory.  To create the virtualenv it assumes that there is a `python3`
-(or `python` for Windows) executable in your path with access to the `venv`
-package. If for any reason the automatic creation of the virtualenv fails,
-you can create the virtualenv manually.
+- **API Layer**: API Gateway with Lambda integrations for order processing
+- **Event Processing**: EventBridge for centralized event routing and processing
+- **Data Storage**: DynamoDB Global Tables for multi-region data consistency
+- **Workflow Management**: Step Functions for order orchestration
+- **Service Mesh**: Multiple microservices handling different aspects of order processing
 
-To manually create a virtualenv on MacOS and Linux:
+### Microservices
 
-```
-$ python3 -m venv .venv
-```
+- Order Service (validation and creation)
+- Inventory Service (stock management)
+- Payment Service (transaction processing)
+- Notification Service (customer communications)
+- Shipping Service (fulfillment handling)
 
-After the init process completes and the virtualenv is created, you can use the following
-step to activate your virtualenv.
+### Disaster Recovery
 
-```
-$ source .venv/bin/activate
-```
+- Active-Active Multi-Region Configuration
+- Automatic Failover with Route53 Health Checks
+- Cross-Region Event Replication
+- Global Data Consistency with DynamoDB Global Tables
 
-If you are a Windows platform, you would activate the virtualenv like this:
+### CI/CD Pipeline
 
-```
-% .venv\Scripts\activate.bat
-```
+- Multi-Region Deployment Strategy
+- Automated Testing and Validation
+- Blue/Green Deployment Pattern
+- Infrastructure as Code with CDK
 
-Once the virtualenv is activated, you can install the required dependencies.
+## Technologies Used
 
-```
-$ pip install -r requirements.txt
-```
+- **Infrastructure**: AWS CDK (Python)
+- **Compute**: AWS Lambda, Step Functions
+- **Storage**: DynamoDB Global Tables
+- **Messaging**: EventBridge
+- **API**: API Gateway
+- **CI/CD**: CodePipeline, CodeBuild, CodeDeploy
+- **DNS**: Route53 with Health Checks
+- **Monitoring**: CloudWatch, CloudTrail
 
-At this point you can now synthesize the CloudFormation template for this code.
+## Project Purpose
 
-```
-$ cdk synth
-```
+This project serves as a comprehensive example of building cloud-native, event-driven systems with enterprise-grade reliability. It demonstrates:
 
-To add additional dependencies, for example other CDK libraries, just add
-them to your `setup.py` file and rerun the `pip install -r requirements.txt`
-command.
+- Event-Driven Architecture Patterns
+- Multi-Region High Availability
+- Infrastructure as Code Best Practices
+- Modern CI/CD Workflows
+- Production-Ready Service Design
 
-## Useful commands
+## Getting Started
 
- * `cdk ls`          list all stacks in the app
- * `cdk synth`       emits the synthesized CloudFormation template
- * `cdk deploy`      deploy this stack to your default AWS account/region
- * `cdk diff`        compare deployed stack with current state
- * `cdk docs`        open CDK documentation
+Detailed setup and deployment instructions can be found in the [Setup Guide](docs/setup.md).
 
-Enjoy!
+## Architecture Diagram
+
+See [architecture.png](docs/architecture.png) for a visual representation of the system design.
+
+---
+
+For detailed technical documentation and implementation details, see the [Documentation](docs/) directory.
