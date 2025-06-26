@@ -89,7 +89,8 @@ class PipelineStack(Stack):
                         "build": {
                             "commands": [
                                 "echo Synthesizing CDK app...",
-                                "cdk synth --app 'python app-stacks.py'",
+                                "cdk synth --app 'python app-stacks.py' --output cdk.out",
+                                "ls -la cdk.out/",
                             ]
                         },
                     },

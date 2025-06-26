@@ -1,0 +1,36 @@
+{
+  "version": "44.0.0",
+  "files": {
+    "7d3a9560c0d69aa78ee7b84b188e3d0bf90f113ee06b25db94f983fe005371cc": {
+      "displayName": "CreateOrderFunction/Code",
+      "source": {
+        "path": "asset.7d3a9560c0d69aa78ee7b84b188e3d0bf90f113ee06b25db94f983fe005371cc",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "820242933814-ap-southeast-2": {
+          "bucketName": "cdk-hnb659fds-assets-820242933814-ap-southeast-2",
+          "objectKey": "7d3a9560c0d69aa78ee7b84b188e3d0bf90f113ee06b25db94f983fe005371cc.zip",
+          "region": "ap-southeast-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::820242933814:role/cdk-hnb659fds-file-publishing-role-820242933814-ap-southeast-2"
+        }
+      }
+    },
+    "5add61307827b671cae2455746bcabb674162b57992c17e5170eca368016fcc2": {
+      "displayName": "PrimaryApiStack Template",
+      "source": {
+        "path": "PrimaryApiStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "820242933814-ap-southeast-2": {
+          "bucketName": "cdk-hnb659fds-assets-820242933814-ap-southeast-2",
+          "objectKey": "5add61307827b671cae2455746bcabb674162b57992c17e5170eca368016fcc2.json",
+          "region": "ap-southeast-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::820242933814:role/cdk-hnb659fds-file-publishing-role-820242933814-ap-southeast-2"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

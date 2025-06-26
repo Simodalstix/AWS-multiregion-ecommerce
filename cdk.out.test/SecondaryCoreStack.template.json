@@ -1,0 +1,432 @@
+{
+ "Description": "Core services for secondary region",
+ "Resources": {
+  "OrdersTable315BB997": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "orderId",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "timestamp",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "customerId",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "status",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "CustomerOrders",
+      "KeySchema": [
+       {
+        "AttributeName": "customerId",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "timestamp",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     },
+     {
+      "IndexName": "OrderStatus",
+      "KeySchema": [
+       {
+        "AttributeName": "status",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "timestamp",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "orderId",
+      "KeyType": "HASH"
+     },
+     {
+      "AttributeName": "timestamp",
+      "KeyType": "RANGE"
+     }
+    ],
+    "StreamSpecification": {
+     "StreamViewType": "NEW_AND_OLD_IMAGES"
+    },
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "Project",
+      "Value": "Ecommerce"
+     }
+    ],
+    "TimeToLiveSpecification": {
+     "AttributeName": "ttl",
+     "Enabled": true
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "SecondaryCoreStack/OrdersTable/Resource"
+   }
+  },
+  "OrdersTableSourceTableAttachedManagedPolicySecondaryCoreStackawscdkawsdynamodbReplicaProviderOnEventHandlerServiceRoleC03E044956280813": {
+   "Type": "AWS::IAM::ManagedPolicy",
+   "Properties": {
+    "Description": {
+     "Fn::Join": [
+      "",
+      [
+       "DynamoDB replication managed policy for table ",
+       {
+        "Ref": "OrdersTable315BB997"
+       }
+      ]
+     ]
+    },
+    "Path": "/",
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "dynamodb:*",
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "OrdersTable315BB997",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:dynamodb:ap-southeast-2:820242933814:table/",
+           {
+            "Ref": "OrdersTable315BB997"
+           }
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "OrdersTable315BB997",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Roles": [
+     {
+      "Fn::GetAtt": [
+       "awscdkawsdynamodbReplicaProviderNestedStackawscdkawsdynamodbReplicaProviderNestedStackResource18E3F12D",
+       "Outputs.SecondaryCoreStackawscdkawsdynamodbReplicaProviderOnEventHandlerServiceRoleF932636ARef"
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SecondaryCoreStack/OrdersTable/SourceTableAttachedManagedPolicy-SecondaryCoreStackawscdkawsdynamodbReplicaProviderOnEventHandlerServiceRoleC03E0449/Resource/Resource"
+   }
+  },
+  "OrdersTableSourceTableAttachedManagedPolicySecondaryCoreStackawscdkawsdynamodbReplicaProviderIsCompleteHandlerServiceRoleAA0E843750D1844B": {
+   "Type": "AWS::IAM::ManagedPolicy",
+   "Properties": {
+    "Description": {
+     "Fn::Join": [
+      "",
+      [
+       "DynamoDB replication managed policy for table ",
+       {
+        "Ref": "OrdersTable315BB997"
+       }
+      ]
+     ]
+    },
+    "Path": "/",
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "dynamodb:DescribeTable",
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "OrdersTable315BB997",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "OrdersTable315BB997",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Roles": [
+     {
+      "Fn::GetAtt": [
+       "awscdkawsdynamodbReplicaProviderNestedStackawscdkawsdynamodbReplicaProviderNestedStackResource18E3F12D",
+       "Outputs.SecondaryCoreStackawscdkawsdynamodbReplicaProviderIsCompleteHandlerServiceRole8F02CC09Ref"
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SecondaryCoreStack/OrdersTable/SourceTableAttachedManagedPolicy-SecondaryCoreStackawscdkawsdynamodbReplicaProviderIsCompleteHandlerServiceRoleAA0E8437/Resource/Resource"
+   }
+  },
+  "OrdersTableReplicaapsoutheast298A3AAC1": {
+   "Type": "Custom::DynamoDBReplica",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "awscdkawsdynamodbReplicaProviderNestedStackawscdkawsdynamodbReplicaProviderNestedStackResource18E3F12D",
+      "Outputs.SecondaryCoreStackawscdkawsdynamodbReplicaProviderframeworkonEvent314870CFArn"
+     ]
+    },
+    "TableName": {
+     "Ref": "OrdersTable315BB997"
+    },
+    "Region": "ap-southeast-2",
+    "SkipReplicaDeletion": true
+   },
+   "DependsOn": [
+    "OrdersTableSourceTableAttachedManagedPolicySecondaryCoreStackawscdkawsdynamodbReplicaProviderIsCompleteHandlerServiceRoleAA0E843750D1844B",
+    "OrdersTableSourceTableAttachedManagedPolicySecondaryCoreStackawscdkawsdynamodbReplicaProviderOnEventHandlerServiceRoleC03E044956280813"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "SecondaryCoreStack/OrdersTable/Replicaap-southeast-2/Default"
+   }
+  },
+  "awscdkawsdynamodbReplicaProviderNestedStackawscdkawsdynamodbReplicaProviderNestedStackResource18E3F12D": {
+   "Type": "AWS::CloudFormation::Stack",
+   "Properties": {
+    "Parameters": {
+     "referencetoSecondaryCoreStackOrdersTableCA11431ARef": {
+      "Ref": "OrdersTable315BB997"
+     }
+    },
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "Project",
+      "Value": "Ecommerce"
+     }
+    ],
+    "TemplateURL": {
+     "Fn::Join": [
+      "",
+      [
+       "https://s3.us-west-2.",
+       {
+        "Ref": "AWS::URLSuffix"
+       },
+       "/cdk-hnb659fds-assets-820242933814-us-west-2/48aff62e4e4664b8d6f797aefc2f0a89f7820deb957c0ca9ff40cfd50ac36340.json"
+      ]
+     ]
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "SecondaryCoreStack/@aws-cdk--aws-dynamodb.ReplicaProvider.NestedStack/@aws-cdk--aws-dynamodb.ReplicaProvider.NestedStackResource",
+    "aws:asset:path": "SecondaryCoreStackawscdkawsdynamodbReplicaProviderEDCF5148.nested.template.json",
+    "aws:asset:property": "TemplateURL"
+   }
+  },
+  "EcommerceEventBus1997A5D8": {
+   "Type": "AWS::Events::EventBus",
+   "Properties": {
+    "Name": "ecommerce-events",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "Project",
+      "Value": "Ecommerce"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SecondaryCoreStack/EcommerceEventBus/Resource"
+   }
+  },
+  "EcommerceEventBusEventArchiveD236546E": {
+   "Type": "AWS::Events::Archive",
+   "Properties": {
+    "ArchiveName": "ecommerce-events-archive",
+    "Description": "Archive of all ecommerce events",
+    "EventPattern": {
+     "source": [
+      "ecommerce.orders"
+     ]
+    },
+    "RetentionDays": 365,
+    "SourceArn": {
+     "Fn::GetAtt": [
+      "EcommerceEventBus1997A5D8",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SecondaryCoreStack/EcommerceEventBus/EventArchive/Archive"
+   }
+  },
+  "OrderEventsRule9F0D06B1": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "Description": "Handle order processing events",
+    "EventBusName": {
+     "Ref": "EcommerceEventBus1997A5D8"
+    },
+    "EventPattern": {
+     "source": [
+      "ecommerce.orders"
+     ]
+    },
+    "State": "ENABLED"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SecondaryCoreStack/OrderEventsRule/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/7VTwW7bMAz9lvJYKF6b3nzLUqMo1qSZnWEYjMKQLSbRKkuBRKczBP/7INvZkhUoOmA7iSIf+cgnahpNr66jqwv+4iaVeJ4oWUY+I149M/7iCi9azWsjysiveakw97DnliRJoz9hC7EHzWuEGC6BAbX7YGbQMXDG0tuIUiol9XZhRHCtZt+KVZIWafL5S5KtgYHF2hy4WhklqxZisEhc6j6wV7LioYcUt9JoN1Z3ZJHXEMMy+VrMlrfF48Ntcb+Y3SVZ4JY1rs2DPOCMyMqyoaGrjnngQtwpU3KVYWW04La91wJ/QJx7kMFa/p7hXQJ0T/+r7BObb3T/GB2TvI78gmu+RTHolHsQ6Cor96HUmG+NQgdxDpcwtEXEq93apEbhqVuIjDhhjZoC3Hdvuf8pTT/U2SAdw0MARD4J58fGBWCAHe9sZqudPISddKaxFR4DYzuvG+wrrjgRWh0kHtLGJQj7hfoEzYfyv55oYB9JWdr0v+FvSfC0x1GN5CwjP08ZtQl0XcdSHGK9mGzeODL1H76NPjqCPXzl+UY/NrRvqGOrlnZGf7iJrqfRzcV3J+XENjr8jSgdzp+sdIV+EwQAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "SecondaryCoreStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "OrdersTableName": {
+   "Description": "DynamoDB Orders Table Name",
+   "Value": {
+    "Ref": "OrdersTable315BB997"
+   },
+   "Export": {
+    "Name": "SecondaryCoreStack-OrdersTableName"
+   }
+  },
+  "EventBusArn": {
+   "Description": "EventBridge Event Bus ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "EcommerceEventBus1997A5D8",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "SecondaryCoreStack-EventBusArn"
+   }
+  },
+  "ExportsOutputRefOrdersTable315BB997F7C1D27E": {
+   "Value": {
+    "Ref": "OrdersTable315BB997"
+   },
+   "Export": {
+    "Name": "SecondaryCoreStack:ExportsOutputRefOrdersTable315BB997F7C1D27E"
+   }
+  },
+  "ExportsOutputFnGetAttEcommerceEventBus1997A5D8Arn6D7B4DCB": {
+   "Value": {
+    "Fn::GetAtt": [
+     "EcommerceEventBus1997A5D8",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "SecondaryCoreStack:ExportsOutputFnGetAttEcommerceEventBus1997A5D8Arn6D7B4DCB"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

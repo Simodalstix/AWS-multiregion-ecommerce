@@ -1,0 +1,36 @@
+{
+  "version": "44.0.0",
+  "files": {
+    "7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200": {
+      "displayName": "SecondaryNetworkStack/Custom::VpcRestrictDefaultSGCustomResourceProvider Code",
+      "source": {
+        "path": "asset.7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "820242933814-us-west-2": {
+          "bucketName": "cdk-hnb659fds-assets-820242933814-us-west-2",
+          "objectKey": "7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200.zip",
+          "region": "us-west-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::820242933814:role/cdk-hnb659fds-file-publishing-role-820242933814-us-west-2"
+        }
+      }
+    },
+    "4004a4d2cc90d0585db6fd87f92494e101032d4d34ced653257768c45e11b665": {
+      "displayName": "SecondaryNetworkStack Template",
+      "source": {
+        "path": "SecondaryNetworkStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "820242933814-us-west-2": {
+          "bucketName": "cdk-hnb659fds-assets-820242933814-us-west-2",
+          "objectKey": "4004a4d2cc90d0585db6fd87f92494e101032d4d34ced653257768c45e11b665.json",
+          "region": "us-west-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::820242933814:role/cdk-hnb659fds-file-publishing-role-820242933814-us-west-2"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}
