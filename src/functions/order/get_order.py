@@ -5,9 +5,24 @@ from typing import Dict, Any
 from botocore.exceptions import ClientError
 
 
-def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
-    dynamodb = boto3.resource("dynamodb")
+dynamodb = None
+
+
+def get_order_by_id(order_id: str) -> Dict[str, Any] | None:
+    """Retrieve an order from DynamoDB by order ID"""
+    global dynamodb
+    if dynamodb is None:
+        dynamodb = boto3.resource("dynamodb")
     table = dynamodb.Table(os.environ["ORDERS_TABLE"])
+    try:
+        response = table.get_item(Key={"orderId": order_id})
+        return response.get("Item")
+    except ClientError as e:
+        print(f"Error retrieving order: {str(e)}")
+        return None
+
+
+def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     """Lambda handler for retrieving orders"""
     try:
         # Get order ID from path parameters
