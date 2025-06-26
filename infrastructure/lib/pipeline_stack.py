@@ -90,6 +90,9 @@ class PipelineStack(Stack):
                             "commands": [
                                 "echo Synthesizing CDK app...",
                                 "cdk synth --app 'python app-stacks.py' --output cdk.out",
+                                "echo Publishing CDK assets...",
+                                "npm install -g @aws-cdk/asset-publisher",
+                                'for file in cdk.out/*.assets.json; do [ -f "$file" ] && cdk-assets publish --path "$file" --verbose || echo "No assets file: $file"; done',
                                 "ls -la cdk.out/",
                             ]
                         },
@@ -108,6 +111,10 @@ class PipelineStack(Stack):
                     "sts:AssumeRole",
                     "iam:PassRole",
                     "cloudformation:*",
+                    "s3:GetObject",
+                    "s3:PutObject",
+                    "s3:GetBucketLocation",
+                    "s3:ListBucket",
                 ],
                 resources=["*"],
             )
