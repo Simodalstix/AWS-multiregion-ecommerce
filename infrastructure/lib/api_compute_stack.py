@@ -7,7 +7,8 @@ from aws_cdk import (
     aws_route53_targets as targets,
     aws_certificatemanager as acm,
     Duration,
-    CfnOutput
+    CfnOutput,
+    CfnResource
 )
 from constructs import Construct
 
@@ -76,6 +77,24 @@ class ApiComputeStack(Stack):
             vpc=vpc,
             environment={
                 "ORDERS_TABLE": orders_table_name
+            }
+        )
+
+        # Create CloudWatch Logs role for API Gateway
+        api_gateway_logs_role = iam.Role(
+            self, "ApiGatewayCloudWatchLogsRole",
+            assumed_by=iam.ServicePrincipal("apigateway.amazonaws.com"),
+            managed_policies=[
+                iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AmazonAPIGatewayPushToCloudWatchLogs")
+            ]
+        )
+
+        # Set the CloudWatch Logs role for API Gateway account settings
+        api_gateway_account = CfnResource(
+            self, "ApiGatewayAccount",
+            type="AWS::ApiGateway::Account",
+            properties={
+                "CloudWatchRoleArn": api_gateway_logs_role.role_arn
             }
         )
 
