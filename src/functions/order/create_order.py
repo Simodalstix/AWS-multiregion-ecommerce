@@ -3,6 +3,7 @@ import os
 import uuid
 import boto3
 from datetime import datetime
+from decimal import Decimal
 from typing import Dict, Any
 
 dynamodb = boto3.resource('dynamodb')
@@ -20,7 +21,7 @@ def create_order_record(order_data: Dict[str, Any]) -> Dict[str, Any]:
         'timestamp': timestamp,
         'customerId': order_data['customerId'],
         'items': order_data['items'],
-        'totalAmount': sum(item['price'] * item['quantity'] for item in order_data['items']),
+        'totalAmount': sum(Decimal(str(item['price'])) * item['quantity'] for item in order_data['items']),
         'status': 'PENDING',
         'ttl': int((datetime.now().timestamp() + (90 * 24 * 60 * 60)))  # 90 days TTL
     }
@@ -34,7 +35,7 @@ def publish_order_event(order: Dict[str, Any], event_type: str) -> None:
         Entries=[{
             'Source': 'ecommerce.orders',
             'DetailType': event_type,
-            'Detail': json.dumps(order),
+            'Detail': json.dumps(order, default=str),
             'EventBusName': event_bus_arn.split('/')[-1]
         }]
     )
@@ -62,7 +63,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         return {
             'statusCode': 200,
-            'body': json.dumps(order)
+            'body': json.dumps(order, default=str)
         }
         
     except Exception as e:

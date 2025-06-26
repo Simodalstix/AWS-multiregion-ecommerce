@@ -37,7 +37,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         return {
             'statusCode': 200,
-            'body': json.dumps(order)
+            'body': json.dumps(order, default=str)
         }
         
     except KeyError:
