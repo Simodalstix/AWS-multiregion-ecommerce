@@ -65,7 +65,7 @@ class PipelineStack(Stack):
         )
         test_project.add_to_role_policy(
             iam.PolicyStatement(
-                actions=["dynamodb:GetItem", "dynamodb:PutItem"],
+                actions=["dynamodb:GetItem", "dynamodb:PutItem", "events:PutEvents"],
                 resources=["*"],
             )
         )
@@ -87,7 +87,10 @@ class PipelineStack(Stack):
                             ],
                         },
                         "build": {
-                            "commands": ["echo Synthesizing CDK app...", "cdk synth"]
+                            "commands": [
+                                "echo Synthesizing CDK app...",
+                                "cdk synth --app 'python app-stacks.py'",
+                            ]
                         },
                     },
                     "artifacts": {"files": ["cdk.out/**/*"]},
@@ -96,6 +99,17 @@ class PipelineStack(Stack):
             environment=codebuild.BuildEnvironment(
                 build_image=codebuild.LinuxBuildImage.STANDARD_7_0
             ),
+        )
+        build_project.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=[
+                    "ec2:DescribeAvailabilityZones",
+                    "sts:AssumeRole",
+                    "iam:PassRole",
+                    "cloudformation:*",
+                ],
+                resources=["*"],
+            )
         )
 
         # Create Pipeline
