@@ -1,6 +1,7 @@
 import json
 import os
 import boto3
+from boto3.dynamodb.conditions import Key
 from typing import Dict, Any
 from botocore.exceptions import ClientError
 
@@ -15,8 +16,14 @@ def get_order_by_id(order_id: str) -> Dict[str, Any]:
         dynamodb = boto3.resource("dynamodb")
     table = dynamodb.Table(os.environ["ORDERS_TABLE"])
     try:
-        response = table.get_item(Key={"orderId": order_id})
-        return response.get("Item")
+        # Since we have a composite key (orderId + timestamp), we need to query
+        # instead of get_item when we only know the partition key
+        response = table.query(
+            KeyConditionExpression=Key('orderId').eq(order_id)
+        )
+        items = response.get('Items', [])
+        # Return the first (and should be only) item since orderId should be unique
+        return items[0] if items else None
     except ClientError as e:
         print(f"Error retrieving order: {str(e)}")
         return None
