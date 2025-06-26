@@ -163,7 +163,7 @@ class PipelineStack(Stack):
                     action_name="Deploy_Primary_Network",
                     stack_name="PrimaryNetworkStack",
                     template_path=build_output.at_path(
-                        "PrimaryNetworkStack.template.json"
+                        "cdk.out/PrimaryNetworkStack.template.json"
                     ),
                     admin_permissions=True,
                     run_order=1,
@@ -172,7 +172,7 @@ class PipelineStack(Stack):
                     action_name="Deploy_Primary_Core",
                     stack_name="PrimaryCoreStack",
                     template_path=build_output.at_path(
-                        "PrimaryCoreStack.template.json"
+                        "cdk.out/PrimaryCoreStack.template.json"
                     ),
                     admin_permissions=True,
                     run_order=2,
@@ -180,7 +180,9 @@ class PipelineStack(Stack):
                 pipeline_actions.CloudFormationCreateUpdateStackAction(
                     action_name="Deploy_Primary_Api",
                     stack_name="PrimaryApiStack",
-                    template_path=build_output.at_path("PrimaryApiStack.template.json"),
+                    template_path=build_output.at_path(
+                        "cdk.out/PrimaryApiStack.template.json"
+                    ),
                     admin_permissions=True,
                     run_order=3,
                 ),
@@ -195,7 +197,7 @@ class PipelineStack(Stack):
                     action_name="Deploy_Secondary_Network",
                     stack_name="SecondaryNetworkStack",
                     template_path=build_output.at_path(
-                        "SecondaryNetworkStack.template.json"
+                        "cdk.out/SecondaryNetworkStack.template.json"
                     ),
                     admin_permissions=True,
                     region="us-west-2",
@@ -205,7 +207,7 @@ class PipelineStack(Stack):
                     action_name="Deploy_Secondary_Core",
                     stack_name="SecondaryCoreStack",
                     template_path=build_output.at_path(
-                        "SecondaryCoreStack.template.json"
+                        "cdk.out/SecondaryCoreStack.template.json"
                     ),
                     admin_permissions=True,
                     region="us-west-2",
@@ -215,7 +217,7 @@ class PipelineStack(Stack):
                     action_name="Deploy_Secondary_Api",
                     stack_name="SecondaryApiStack",
                     template_path=build_output.at_path(
-                        "SecondaryApiStack.template.json"
+                        "cdk.out/SecondaryApiStack.template.json"
                     ),
                     admin_permissions=True,
                     region="us-west-2",
