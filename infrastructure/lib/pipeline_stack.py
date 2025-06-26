@@ -94,7 +94,7 @@ class PipelineStack(Stack):
                             ]
                         },
                     },
-                    "artifacts": {"files": ["cdk.out/**/*"]},
+                    "artifacts": {"files": ["cdk.out/**/*"], "name": "BuildOutput"},
                 }
             ),
             environment=codebuild.BuildEnvironment(
@@ -166,6 +166,10 @@ class PipelineStack(Stack):
                         "cdk.out/PrimaryNetworkStack.template.json"
                     ),
                     admin_permissions=True,
+                    parameter_overrides={
+                        "BootstrapVersion": "/cdk-bootstrap/hnb659fds/version"
+                    },
+                    extra_inputs=[build_output],
                     run_order=1,
                 ),
                 pipeline_actions.CloudFormationCreateUpdateStackAction(
@@ -175,6 +179,10 @@ class PipelineStack(Stack):
                         "cdk.out/PrimaryCoreStack.template.json"
                     ),
                     admin_permissions=True,
+                    parameter_overrides={
+                        "BootstrapVersion": "/cdk-bootstrap/hnb659fds/version"
+                    },
+                    extra_inputs=[build_output],
                     run_order=2,
                 ),
                 pipeline_actions.CloudFormationCreateUpdateStackAction(
@@ -184,6 +192,10 @@ class PipelineStack(Stack):
                         "cdk.out/PrimaryApiStack.template.json"
                     ),
                     admin_permissions=True,
+                    parameter_overrides={
+                        "BootstrapVersion": "/cdk-bootstrap/hnb659fds/version"
+                    },
+                    extra_inputs=[build_output],
                     run_order=3,
                 ),
             ],
@@ -200,6 +212,10 @@ class PipelineStack(Stack):
                         "cdk.out/SecondaryNetworkStack.template.json"
                     ),
                     admin_permissions=True,
+                    parameter_overrides={
+                        "BootstrapVersion": "/cdk-bootstrap/hnb659fds/version"
+                    },
+                    extra_inputs=[build_output],
                     region="us-west-2",
                     run_order=1,
                 ),
@@ -210,6 +226,10 @@ class PipelineStack(Stack):
                         "cdk.out/SecondaryCoreStack.template.json"
                     ),
                     admin_permissions=True,
+                    parameter_overrides={
+                        "BootstrapVersion": "/cdk-bootstrap/hnb659fds/version"
+                    },
+                    extra_inputs=[build_output],
                     region="us-west-2",
                     run_order=2,
                 ),
@@ -220,6 +240,10 @@ class PipelineStack(Stack):
                         "cdk.out/SecondaryApiStack.template.json"
                     ),
                     admin_permissions=True,
+                    parameter_overrides={
+                        "BootstrapVersion": "/cdk-bootstrap/hnb659fds/version"
+                    },
+                    extra_inputs=[build_output],
                     region="us-west-2",
                     run_order=3,
                 ),
