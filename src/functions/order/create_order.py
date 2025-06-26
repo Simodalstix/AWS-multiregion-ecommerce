@@ -52,7 +52,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     """Lambda handler for creating orders"""
     try:
         # Parse request body
-        body = json.loads(event["body"])
+        body = json.loads(event["body"], parse_float=Decimal)
 
         # Validate request
         if not body.get("customerId") or not body.get("items"):

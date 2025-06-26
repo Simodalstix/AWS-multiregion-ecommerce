@@ -63,6 +63,12 @@ class PipelineStack(Stack):
                 build_image=codebuild.LinuxBuildImage.STANDARD_7_0
             ),
         )
+        test_project.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=["dynamodb:GetItem", "dynamodb:PutItem"],
+                resources=["*"],
+            )
+        )
 
         # Create CodeBuild project for CDK synthesis
         build_project = codebuild.PipelineProject(
