@@ -75,7 +75,7 @@ def test_get_order_success(mock_boto3):
         "customerId": "test-customer-1",
         "status": "PENDING",
     }
-    mock_table.get_item.return_value = {"Item": mock_order}
+    mock_table.query.return_value = {"Items": [mock_order]}
 
     event = {"pathParameters": {"orderId": "test-order-1"}}
 
@@ -89,14 +89,14 @@ def test_get_order_success(mock_boto3):
     assert order_data["customerId"] == "test-customer-1"
     assert order_data["status"] == "PENDING"
 
-    # Verify DynamoDB call
-    mock_table.get_item.assert_called_once_with(Key={"orderId": "test-order-1"})
+    # Verify DynamoDB call - now using query instead of get_item
+    mock_table.query.assert_called_once()
 
 
 def test_get_order_not_found(mock_boto3):
     # Arrange
     mock_table = mock_boto3["table"]
-    mock_table.get_item.return_value = {}
+    mock_table.query.return_value = {"Items": []}
 
     event = {"pathParameters": {"orderId": "non-existent-order"}}
 

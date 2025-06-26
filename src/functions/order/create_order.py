@@ -2,7 +2,7 @@ import json
 import os
 import uuid
 import boto3
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Dict, Any
 
@@ -17,7 +17,7 @@ def create_order_record(order_data: Dict[str, Any]) -> Dict[str, Any]:
     if dynamodb is None:
         dynamodb = boto3.resource("dynamodb")
     table = dynamodb.Table(os.environ["ORDERS_TABLE"])
-    timestamp = datetime.utcnow().isoformat()
+    timestamp = datetime.now(timezone.utc).isoformat()
     order_id = str(uuid.uuid4())
 
     item = {
