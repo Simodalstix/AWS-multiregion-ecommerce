@@ -8,7 +8,7 @@ from botocore.exceptions import ClientError
 dynamodb = None
 
 
-def get_order_by_id(order_id: str) -> Dict[str, Any] | None:
+def get_order_by_id(order_id: str) -> Dict[str, Any]:
     """Retrieve an order from DynamoDB by order ID"""
     global dynamodb
     if dynamodb is None:
