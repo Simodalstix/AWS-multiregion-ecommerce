@@ -1,7 +1,5 @@
 # AWS Multi-Region Event-Driven E-commerce Platform
 
-(Agent assisted with RooCode - a Cline fork)
-
 ![Architecture Overview](screenshots/AWS-multiregion-ecommerce.png)
 
 This project demonstrates an advanced, production-ready e-commerce order processing system built with AWS CDK. It showcases event-driven architecture, multi-region disaster recovery, and automated CI/CD pipelines.
@@ -99,6 +97,8 @@ Detailed setup and deployment instructions can be found in the [Setup Guide](doc
 ---
 
 For detailed technical documentation and implementation details, see the [Documentation](docs/) directory.
+
+Project code is Agent assisted with RooCode - a Cline fork
 
 ## Screenshots
 
