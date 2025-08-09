@@ -4,6 +4,7 @@ import aws_cdk as cdk
 from infrastructure.lib.network_stack import NetworkStack
 from infrastructure.lib.core_services_stack import CoreServicesStack
 from infrastructure.lib.api_compute_stack import ApiComputeStack
+from infrastructure.lib.security.security_baseline_stack import SecurityBaselineStack
 
 app = cdk.App()
 
@@ -19,6 +20,14 @@ secondary_env = cdk.Environment(
 )
 
 # Primary region stacks
+security_baseline = SecurityBaselineStack(
+    app,
+    "SecurityBaselineStack",
+    env=primary_env,
+    description="Security baseline for the organization",
+    security_admin_email=app.node.try_get_context("security_admin_email"),
+)
+
 primary_network = NetworkStack(
     app,
     "PrimaryNetworkStack",
@@ -82,6 +91,7 @@ for stack in [
     secondary_network,
     secondary_core,
     secondary_api,
+    security_baseline,
 ]:
     cdk.Tags.of(stack).add("Project", "Ecommerce")
     cdk.Tags.of(stack).add("Environment", "Production")
