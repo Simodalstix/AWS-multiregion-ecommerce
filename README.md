@@ -2,7 +2,9 @@
 
 ![Architecture Overview](screenshots/AWS-multiregion-ecommerce.png)
 
-This project demonstrates an advanced, production-ready e-commerce order processing system built with AWS CDK. It showcases event-driven architecture, multi-region disaster recovery, and automated CI/CD pipelines.
+This project is a hands-on implementation of a multi-region, serverless architecture on AWS. It showcases global high availability, disaster recovery, and automated CI/CD deployment pipelines. The stack leverages services such as AWS Lambda, API Gateway, DynamoDB Global Tables, S3, and CloudFront for a fully serverless backend, while AWS CodePipeline and CodeBuild handle continuous delivery across multiple regions.
+
+Originally designed as an ecommerce proof of concept, the architecture is purposefully flexible and can be adapted for a wide range of applications — from APIs to event-driven platforms. This repository serves as both a learning resource and a reusable deployment blueprint for building globally resilient, low-maintenance, cloud-native applications.
 
 ## Architecture Overview
 
