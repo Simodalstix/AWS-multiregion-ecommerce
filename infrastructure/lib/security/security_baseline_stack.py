@@ -11,6 +11,7 @@ from aws_cdk import (
     CfnOutput,
     Duration,
     Tags,
+    CfnResource,
 )
 from constructs import Construct
 
@@ -27,17 +28,25 @@ class SecurityBaselineStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
 
         # Get the security admin account ID from context
-        security_admin_account_id = self.node.try_get_context(
-            "security_admin_account_id"
+        org_delegated_admin_account_id = self.node.try_get_context(
+            "orgDelegatedAdminAccountId"
         )
-        if not security_admin_account_id:
-            raise ValueError("Security admin account ID must be provided in context")
+        if not org_delegated_admin_account_id:
+            raise ValueError(
+                "Organization delegated admin account ID must be provided in context"
+            )
+
+        security_account_id = self.node.try_get_context("securityAccountId")
+        if not security_account_id:
+            raise ValueError("Security account ID must be provided in context")
+
+        enable_eks_audit = self.node.try_get_context("enableEksAudit")
 
         # Create a delegated admin role for the security account
         delegated_admin_role = iam.Role(
             self,
             "DelegatedAdminRole",
-            assumed_by=iam.AccountPrincipal(security_admin_account_id),
+            assumed_by=iam.AccountPrincipal(org_delegated_admin_account_id),
             role_name="SecurityBaselineDelegatedAdminRole",
             managed_policies=[
                 iam.ManagedPolicy.from_aws_managed_policy_name(
@@ -63,7 +72,7 @@ class SecurityBaselineStack(Stack):
                 s3_logs=guardduty.CfnDetector.S3LogsConfigurationProperty(enable=True),
                 kubernetes=guardduty.CfnDetector.KubernetesConfigurationProperty(
                     audit_logs=guardduty.CfnDetector.KubernetesAuditLogsConfigurationProperty(
-                        enable=True
+                        enable=enable_eks_audit
                     )
                 ),
             ),
@@ -74,7 +83,7 @@ class SecurityBaselineStack(Stack):
             "GuardDutyMember",
             detector_id=guardduty_detector.ref,
             email=security_admin_email,
-            member_id=security_admin_account_id,
+            member_id=security_account_id,
             status="Invited",
         )
 

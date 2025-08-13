@@ -1,115 +1,180 @@
-# AWS Multi-Region Event-Driven E-commerce Platform
+# Serverless Multi-Region E-commerce Platform with Security and Monitoring
 
 ![Architecture Overview](screenshots/AWS-multiregion-ecommerce.png)
 
-This project is a hands-on implementation of a multi-region, serverless architecture on AWS. It showcases global high availability, disaster recovery, and automated CI/CD deployment pipelines. The stack leverages services such as AWS Lambda, API Gateway, DynamoDB Global Tables, S3, and CloudFront for a fully serverless backend, while AWS CodePipeline and CodeBuild handle continuous delivery across multiple regions.
+## Overview
 
-Originally designed as an ecommerce proof of concept, the architecture is purposefully flexible and can be adapted for a wide range of applications — from APIs to event-driven platforms. This repository serves as both a learning resource and a reusable deployment blueprint for building globally resilient, low-maintenance, cloud-native applications.
+This project is a **serverless, event-driven e-commerce platform** built on AWS with **multi-region high availability** and **disaster recovery** capabilities. The architecture provides automatic failover between AWS regions (Australia and US West) and includes comprehensive enterprise security and monitoring features, including SIEM integration and compliance capabilities.
 
-## Architecture Overview
+### Core Features
 
-### Core Components
+- **Serverless Architecture**: No servers to manage, auto-scaling infrastructure
+- **Multi-Region Deployment**: Active-active configuration across AWS regions
+- **Event-Driven Design**: Loose coupling between services via EventBridge
+- **Disaster Recovery**: Automatic failover capabilities (manual activation currently, with plans for enhanced automation)
+- **CI/CD Pipeline**: Automated deployments via CodePipeline and CodeBuild
 
-- **API Layer**: API Gateway with Lambda integrations for order processing
-- **Event Processing**: EventBridge for centralized event routing and processing (ready for future expansion)
-- **Data Storage**: DynamoDB Global Tables for multi-region data consistency
-- **Workflow Management**: Step Functions for order orchestration
-- **Service Mesh**: Multiple microservices handling different aspects of order processing
+### Additional Enterprise Features
 
-### Network Architecture
+The platform includes optional stacks for enterprise requirements:
 
-- **High Availability VPC**: Spans 3 Availability Zones for maximum resilience
-- **Dual NAT Gateways**: Each AZ has its own NAT gateway to prevent single points of failure
-- **Private Lambda Execution**: Secure application logic runs in isolated private subnets
-- **Multi-Layer Security**: Public, private, and isolated subnet tiers for defense in depth
-
-### Microservices
-
-- Order Service (validation and creation)
-- Inventory Service (stock management)
-- Payment Service (transaction processing)
-- Notification Service (customer communications)
-- Shipping Service (fulfillment handling)
-
-### Disaster Recovery
-
-- Active-Active Multi-Region Configuration
-- Automatic Failover with Route53 Health Checks (to be implemented)
-- Cross-Region Event Replication
-- Global Data Consistency with DynamoDB Global Tables
-
-### CI/CD Pipeline
-
-- Multi-Region Deployment Strategy
-- Automated Testing and Validation
-- Blue/Green Deployment Pattern
-- Infrastructure as Code with CDK
-
-## Technologies Used
-
-- **Infrastructure**: AWS CDK (Python)
-- **Compute**: AWS Lambda, Step Functions
-- **Storage**: DynamoDB Global Tables
-- **Messaging**: EventBridge
-- **API**: API Gateway
-- **CI/CD**: CodePipeline, CodeBuild, CodeDeploy
-- **DNS**: Route53 with Health Checks
-- **Monitoring**: CloudWatch, CloudTrail
-
-## Event-Driven Architecture
-
-The system leverages EventBridge as the central nervous system for event routing. This design provides:
-
-- **Loose Coupling**: Services communicate through events rather than direct calls
-- **Scalability**: Easy to add new event consumers without modifying producers
-- **Future Expansion**: EventBridge is configured and ready for additional integrations such as:
-  - Real-time analytics and reporting
-  - Customer notification systems
-  - Inventory management workflows
-  - Third-party service integrations
-  - Audit and compliance logging
-
-## Network Design Rationale
-
-### Why Dual NAT Gateways?
-
-Each region deploys **2 NAT Gateways** across different Availability Zones to ensure:
-
-- **High Availability**: If one AZ fails, Lambda functions in other AZs maintain internet connectivity
-- **No Single Point of Failure**: Critical for production e-commerce systems requiring 99.9%+ uptime
-- **Load Distribution**: Traffic is distributed across multiple AZs for better performance
-- **AWS Best Practice**: Recommended pattern for production workloads
-
-This design choice prioritizes reliability over cost, ensuring your e-commerce platform remains operational even during AZ-level outages.
-
-## Project Purpose
-
-This project serves as a comprehensive example of building cloud-native, event-driven systems with enterprise-grade reliability. It demonstrates:
-
-- Event-Driven Architecture Patterns
-- Multi-Region High Availability
-- Infrastructure as Code Best Practices
-- Modern CI/CD Workflows
-- Production-Ready Service Design
+- **Security Monitoring**: GuardDuty, Security Hub, and Detective integration
+- **Centralized Logging**: Security Lake with OCSF normalization
+- **SIEM Integration**: Connect to OpenSearch, Splunk, or Elastic for security analytics
+- **Compliance**: AWS Config rules and conformance packs
 
 ## Getting Started
 
-Detailed setup and deployment instructions can be found in the [Setup Guide](docs/setup.md).
+For detailed deployment instructions, see [Getting Started Guide](docs/GETTING-STARTED.md).
 
----
+Quick deployment of core infrastructure:
 
-For detailed technical documentation and implementation details, see the [Documentation](docs/) directory.
+```bash
+# Setup environment
+git clone git@github.com:Simodalstix/AWS-multiregion-ecommerce.git
+cd AWS-multiregion-ecommerce
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+npm install -g aws-cdk
+aws configure
 
-Project code is Agent assisted with RooCode - a Cline fork
+# Bootstrap CDK (one-time setup)
+cdk bootstrap aws://YOUR-ACCOUNT-ID/ap-southeast-2
 
-## Screenshots
+# Deploy core infrastructure
+cdk deploy PrimaryNetworkStack PrimaryCoreStack PrimaryApiStack --app "python app-stacks.py"
 
-### Deployment Pipeline
+# Test your API
+API_URL=$(aws cloudformation describe-stacks --stack-name PrimaryApiStack --query 'Stacks[0].Outputs[?OutputKey==`ApiEndpoint`].OutputValue' --output text)
+echo "API Endpoint: $API_URL"
 
-![Deployment Pipeline](screenshots/codepipeline-console.png)
+curl -X POST ${API_URL}orders \
+  -H "Content-Type: application/json" \
+  -d '{"customerId": "123", "items": [{"id": "item1", "quantity": 1, "price": 29.99}]}'
+```
 
-### DynamoDB tables
+## 🎯 What This Actually Does
 
-![DynamoDB global tables](screenshots/tables-console.png)
+This project gives you a **production-ready e-commerce backend** with:
 
-![Order ID's in table](screenshots/orderid-console.png)
+- ✅ **Multi-region high availability** (Australia + US West)
+- ✅ **Serverless architecture** (no servers to manage)
+- ✅ **Auto-scaling** (handles any traffic volume)
+- ✅ **Disaster recovery** (automatic failover with manual activation currently)
+- ✅ **Event-driven design** (extensible for new features)
+- ✅ **Security and monitoring** (comprehensive enterprise features including SIEM integration)
+
+## 📁 Project Structure - What Matters
+
+```
+├── app-stacks.py              # 🎯 START HERE - Deploy this first
+├── infrastructure/lib/
+│   ├── network_stack.py       # VPC, subnets (required)
+│   ├── core_services_stack.py # DynamoDB tables (required)
+│   ├── api_compute_stack.py   # API Gateway + Lambda (required)
+│   ├── pipeline_stack.py      # CI/CD (optional - for automation)
+│   └── security/              # Enterprise security (optional)
+├── src/functions/             # Your actual business logic
+└── docs/                      # Documentation (this file!)
+```
+
+## 🎯 Deployment Options - Pick Your Path
+
+### Option 1: Manual Deployment (Recommended for Learning)
+
+Deploy stacks directly using CDK:
+
+```bash
+# Deploy core infrastructure only (ignore security for now)
+cdk deploy PrimaryNetworkStack PrimaryCoreStack PrimaryApiStack --app "python app-stacks.py"
+
+# Later, add secondary region for disaster recovery
+cdk deploy SecondaryNetworkStack SecondaryCoreStack SecondaryApiStack --app "python app-stacks.py"
+```
+
+### Option 2: CI/CD Pipeline (For Production)
+
+Automatically deploy on git push:
+
+```bash
+# 1. Store GitHub token in AWS Secrets Manager
+aws secretsmanager create-secret --name github-token --secret-string "your-github-token"
+
+# 2. Deploy pipeline
+cdk deploy PipelineStack
+
+# 3. Now any git push to main automatically deploys!
+```
+
+## 🔧 Testing Your Deployment
+
+### Unit Tests
+
+```bash
+python -m pytest tests/ -v
+```
+
+### API Testing
+
+```bash
+# Get your API endpoint
+aws cloudformation describe-stacks --stack-name PrimaryApiStack --query 'Stacks[0].Outputs'
+
+# Test creating an order
+curl -X POST https://YOUR-API-URL/prod/orders \
+  -H "Content-Type: application/json" \
+  -d '{"customerId": "123", "items": [{"id": "item1", "quantity": 1, "price": 29.99}]}'
+
+# Test getting an order
+curl https://YOUR-API-URL/prod/orders/YOUR-ORDER-ID
+```
+
+## 🛡️ Security Features (Advanced)
+
+The security components are **completely optional** enterprise features:
+
+- **Security Lake**: Centralized security logging
+- **SIEM Integration**: Connect to Splunk, Elastic, or OpenSearch
+- **GuardDuty**: Threat detection
+- **Security Hub**: Security compliance monitoring
+
+**Skip these initially!** Focus on getting the core e-commerce system working first.
+
+See [SECURITY-LAKE.md](docs/SECURITY-LAKE.md) for security documentation (but only after core system works).
+
+## 📚 Detailed Documentation
+
+- [Setup Guide](docs/setup.md) - Complete setup instructions
+- [Architecture](docs/architecture.md) - Technical architecture details
+- [Security Lake](docs/SECURITY-LAKE.md) - Security and SIEM integration
+
+## 🎯 Key Files You Should Know
+
+| File                                                          | Purpose                     | When to Use                          |
+| ------------------------------------------------------------- | --------------------------- | ------------------------------------ |
+| [`app-stacks.py`](app-stacks.py:1)                            | Main deployment entry point | **Start here for manual deployment** |
+| [`pipeline_stack.py`](infrastructure/lib/pipeline_stack.py:1) | CI/CD pipeline              | For automated deployments            |
+| [`requirements.txt`](requirements.txt:1)                      | Python dependencies         | Install before deploying             |
+| [`cdk.json`](cdk.json:1)                                      | CDK configuration           | Modify for custom settings           |
+
+## 🚨 Common Issues and Solutions
+
+1. **"cdk: command not found"**
+
+   ```bash
+   npm install -g aws-cdk
+   ```
+
+2. **Bootstrap errors**
+
+   ```bash
+   cdk bootstrap aws://YOUR-ACCOUNT-ID/YOUR-REGION
+   ```
+
+3. **Permission denied**
+   Make sure your AWS user has AdministratorAccess policy
+
+## 📞 Support
+
+For issues and feature requests, please create an issue in the GitHub repository.

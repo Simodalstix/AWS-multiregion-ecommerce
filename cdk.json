@@ -85,6 +85,27 @@
     "@aws-cdk/s3-notifications:addS3TrustKeyPolicyForSnsSubscriptions": true,
     "@aws-cdk/aws-ec2:requirePrivateSubnetsForEgressOnlyInternetGateway": true,
     "@aws-cdk/aws-s3:publicAccessBlockedByDefault": true,
-    "@aws-cdk/aws-lambda:useCdkManagedLogGroup": true
+    "@aws-cdk/aws-lambda:useCdkManagedLogGroup": true,
+
+    "//": "------------------ Security-Specific Context ------------------",
+    "//": "The following context variables are used to configure security-related aspects of the application.",
+
+    "//": "The AWS account ID of the organization's delegated administrator for security services.",
+    "orgDelegatedAdminAccountId": null,
+
+    "//": "The AWS account ID where centralized security services and resources are deployed.",
+    "securityAccountId": null,
+
+    "//": "The AWS account ID designated for collecting and storing logs from across the organization.",
+    "loggingAccountId": null,
+
+    "//": "The type of SIEM (Security Information and Event Management) sink to use for security event forwarding. Options: 'opensearch', 'splunk', 'elastic'.",
+    "sinkType": "opensearch",
+
+    "//": "A list of AWS regions to deploy the security infrastructure to, matching the multi-region setup.",
+    "regions": ["ap-southeast-2", "us-west-2"],
+
+    "//": "A feature flag to enable or disable EKS audit logging. Disabled by default.",
+    "enableEksAudit": false
   }
 }

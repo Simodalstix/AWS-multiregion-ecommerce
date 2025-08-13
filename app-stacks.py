@@ -36,7 +36,7 @@ security_lake = SecurityLakeStack(
     env=primary_env,
     primary_region=primary_env.region,
     secondary_region=secondary_env.region,
-    security_admin_account_id=app.node.try_get_context("security_admin_account_id"),
+    security_admin_account_id=app.node.try_get_context("securityAccountId"),
     description="Security Lake for centralized security data",
 )
 
